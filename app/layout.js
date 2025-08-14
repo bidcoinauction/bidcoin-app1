@@ -7,10 +7,12 @@ import { usePathname } from 'next/navigation';
 // --- ICONS ---
 const LogoIcon = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="currentColor" fontSize="12" fontWeight="bold">B</text></svg>);
 const MoonIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>);
+const UserIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>);
+
 
 const Header = () => {
     const pathname = usePathname();
-    const isDarkTheme = pathname.startsWith('/auctions');
+    const isDarkTheme = pathname.startsWith('/auctions') || pathname.startsWith('/profile');
 
     const headerClasses = isDarkTheme
         ? "sticky top-0 z-50 bg-[#121212]/80 backdrop-blur-lg border-b border-zinc-800 text-white"
@@ -26,14 +28,14 @@ const Header = () => {
                             <span className="font-bold text-lg">Bidcoin</span>
                         </Link>
                         <div className="hidden md:flex items-center space-x-6">
-                            <Link href="/" className={`text-sm font-medium transition-colors ${pathname === '/' ? (isDarkTheme ? 'text-white' : 'text-purple-600') : (isDarkTheme ? 'text-zinc-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')}`}>Home</Link>
+                            <Link href="/" className={`text-sm font-medium transition-colors ${pathname === '/' ? 'text-purple-600' : (isDarkTheme ? 'text-zinc-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')}`}>Home</Link>
                             <Link href="/auctions" className={`text-sm font-medium transition-colors ${pathname.startsWith('/auctions') ? (isDarkTheme ? 'text-white' : 'text-purple-600') : (isDarkTheme ? 'text-zinc-400 hover:text-white' : 'text-slate-600 hover:text-slate-900')}`}>Auctions</Link>
                         </div>
                     </div>
                     <div className="flex items-center space-x-4">
-                         <button className={`p-2 rounded-full transition-colors ${isDarkTheme ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}>
-                            <MoonIcon className="w-5 h-5" />
-                        </button>
+                         <Link href="/profile" className={`p-2 rounded-full transition-colors ${isDarkTheme ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}>
+                            <UserIcon className="w-5 h-5" />
+                        </Link>
                         <button className="bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg text-sm hover:bg-purple-700 transition-colors">
                             Connect Wallet
                         </button>
@@ -56,3 +58,4 @@ export default function RootLayout({ children }) {
     </html>
   );
 }
+
