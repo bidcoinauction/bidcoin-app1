@@ -1,4 +1,4 @@
-// app/profile/page.js
+// app/auctions/profile/page.js
 'use client';
 import React, { useState } from 'react';
 
@@ -26,6 +26,14 @@ const TabButton = ({ label, activeTab, setActiveTab }) => (
     </button>
 );
 
+const getResultBadgeClass = (result) => {
+    const styles = {
+        Won: 'bg-green-500/20 text-green-400',
+        Outbid: 'bg-red-500/20 text-red-400',
+    };
+    return `px-3 py-1 text-xs font-semibold rounded-full ${styles[result] || 'bg-zinc-500/20 text-zinc-400'}`;
+};
+
 const MyBidsTab = () => (
     <div>
         <h3 className="text-xl font-bold text-white mb-4">Active Bids</h3>
@@ -51,7 +59,7 @@ const MyBidsTab = () => (
                         <p className="font-semibold text-white">{bid.name}</p>
                         <p className="text-sm text-zinc-400">Final Price: {bid.finalPrice}</p>
                     </div>
-                    <span className={`px-3 py-1 text-xs font-semibold rounded-full ${bid.result === 'Won' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'}`}>
+                    <span className={getResultBadgeClass(bid.result)}>
                         {bid.result}
                     </span>
                 </div>

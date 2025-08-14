@@ -6,7 +6,7 @@ import { useParams } from 'next/navigation';
 
 // --- HOOKS ---
 const useCountdown = (endTime) => {
-    const [timeLeft, setTimeLeft] = useState({ hours: '00', minutes: '00', seconds: '00' });
+    const [timeLeft, setTimeLeft] = useState({ days: '00', hours: '00', minutes: '00', seconds: '00' });
     useEffect(() => {
         if (!endTime) return;
         const interval = setInterval(() => {
@@ -14,13 +14,15 @@ const useCountdown = (endTime) => {
             const distance = endTime - now;
             if (distance < 0) {
                 clearInterval(interval);
-                setTimeLeft({ hours: '00', minutes: '00', seconds: '00' });
+                setTimeLeft({ days: '00', hours: '00', minutes: '00', seconds: '00' });
                 return;
             }
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
             const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
             const seconds = Math.floor((distance % (1000 * 60)) / 1000);
             setTimeLeft({
+                days: String(days).padStart(2, '0'),
                 hours: String(hours).padStart(2, '0'),
                 minutes: String(minutes).padStart(2, '0'),
                 seconds: String(seconds).padStart(2, '0'),
@@ -30,7 +32,6 @@ const useCountdown = (endTime) => {
     }, [endTime]);
     return timeLeft;
 };
-
 
 // In a real app, this data would be fetched from an API or a shared module.
 const mockAuctionsData = [
@@ -47,43 +48,36 @@ const mockAuctionsData = [
 // --- DETAILED COMPONENTS ---
 
 const AuctionInfo = ({ auction, timeLeft }) => (
-    <div className="bg-[#18181B] border border-zinc-800 rounded-lg p-6 flex flex-col">
-        <div>
-            <h1 className="text-3xl font-bold text-white">{auction.name}</h1>
-            <p className="text-zinc-400 mt-2">{auction.description}</p>
-        </div>
-        <div className="mt-6 pt-4 border-t border-zinc-700 flex-grow flex flex-col justify-end">
-            <div className="flex justify-between items-baseline">
-                <div>
-                    <span className="text-zinc-400 text-sm">Current Price</span>
-                    <p className="text-3xl font-bold text-white mt-1">{auction.priceETH} ETH</p>
-                </div>
-                <div>
-                    <span className="text-zinc-400 text-sm">Time Left</span>
-                    <p className="text-xl font-bold text-white mt-1 font-mono">{timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}</p>
-                </div>
+    <div className="bg-[#18181B] border border-zinc-800 rounded-lg p-6">
+        <h1 className="text-3xl font-bold text-white">{auction.name}</h1>
+        <p className="text-zinc-400 mt-2">{auction.description}</p>
+        
+        <div className="mt-6 grid grid-cols-3 gap-4 text-center">
+            <div>
+                <span className="text-zinc-400 text-sm">Time Left</span>
+                <p className="text-xl font-bold text-white mt-1 font-mono">{timeLeft.days}:{timeLeft.hours}:{timeLeft.minutes}:{timeLeft.seconds}</p>
             </div>
-            <button className="mt-6 w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors">Place Bid</button>
+            <div>
+                <span className="text-zinc-400 text-sm">Current Price</span>
+                <p className="text-xl font-bold text-white mt-1">{auction.priceETH} ETH</p>
+            </div>
+            <div>
+                <span className="text-zinc-400 text-sm">Leader</span>
+                <p className="text-xl font-bold text-white mt-1 font-mono truncate">{auction.leader}</p>
+            </div>
+        </div>
+
+        <div className="mt-6 pt-6 border-t border-zinc-700">
+            <button className="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition-colors text-lg">Place Bid</button>
         </div>
     </div>
 );
 
-const BidBotSetup = () => {
-    const [isBotActive, setIsBotActive] = useState(false);
-    return (
-        <div className="bg-[#18181B] border border-zinc-800 rounded-lg p-6">
-            <div className="flex justify-between items-center"><h3 className="font-bold text-white">BidBot Setup</h3><label htmlFor="toggle" className="flex items-center cursor-pointer"><div className="relative"><input type="checkbox" id="toggle" className="sr-only" checked={isBotActive} onChange={() => setIsBotActive(!isBotActive)} /><div className="block bg-zinc-600 w-14 h-8 rounded-full"></div><div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition ${isBotActive ? 'transform translate-x-full bg-green-400' : ''}`}></div></div></label></div>
-            <p className="text-zinc-400 mt-2 text-sm">Set your max bid and let the bot do the work.</p>
-            <div className="mt-4"><label className="text-sm font-medium text-zinc-300">Max Bid (ETH)</label><input type="number" placeholder="0.5" className="w-full mt-1 bg-zinc-700 border-zinc-600 rounded-md p-2 text-sm focus:ring-blue-500 focus:border-blue-500" disabled={!isBotActive}/></div>
-            <button className="mt-4 w-full bg-green-600 text-white font-bold py-2.5 rounded-lg hover:bg-green-700 transition-colors disabled:bg-zinc-500 disabled:cursor-not-allowed" disabled={!isBotActive}>Activate BidBot</button>
-        </div>
-    );
-};
 
 const BidHistory = ({ history }) => (
-    <div className="bg-[#18181B] border border-zinc-800 rounded-lg p-6 mt-8">
+    <div className="bg-[#18181B] border border-zinc-800 rounded-lg p-6">
         <h3 className="font-bold text-white mb-4">Bid History ({history.length})</h3>
-        <div className="space-y-2 max-h-60 overflow-y-auto">
+        <div className="space-y-2 max-h-96 overflow-y-auto">
             {history.length > 0 ? history.map((bid, index) => (
                 <div key={index} className="flex justify-between bg-zinc-900 p-3 rounded-md text-sm">
                     <span className="font-mono text-zinc-300 truncate">{bid.bidder}</span>
@@ -110,22 +104,13 @@ export default function AuctionDetailPage() {
         <div className="bg-[#121212] text-white -mt-8 -mx-4 sm:-mx-6 lg:-mx-8 p-8 min-h-screen">
             <div className="container mx-auto">
                 <div className="mb-6"><Link href="/auctions" className="text-sm text-blue-400 hover:underline">&larr; Back to all auctions</Link></div>
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div className="lg:col-span-2">
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                            <img src={auction.image} alt={auction.name} className="w-full h-auto object-cover rounded-lg border border-zinc-800" />
-                            <div className="flex flex-col gap-8">
-                                <AuctionInfo auction={auction} timeLeft={timeLeft} />
-                                <BidBotSetup />
-                            </div>
-                        </div>
-                        <BidHistory history={auction.bidHistory} />
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div>
+                        <img src={auction.image} alt={auction.name} className="w-full h-auto object-cover rounded-lg border border-zinc-800" />
                     </div>
                     <div className="space-y-8">
-                         <div className="bg-[#18181B] border border-zinc-800 rounded-lg p-6">
-                            <h3 className="font-bold text-white mb-4">Auction Rules</h3>
-                            <p className="text-sm text-zinc-400">Each bid resets the timer. The last bidder wins.</p>
-                        </div>
+                        <AuctionInfo auction={auction} timeLeft={timeLeft} />
+                        <BidHistory history={auction.bidHistory} />
                     </div>
                 </div>
             </div>
