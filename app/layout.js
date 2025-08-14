@@ -3,10 +3,11 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { WalletContextProvider } from '../components/WalletContextProvider';
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui';
 
 // --- ICONS ---
 const LogoIcon = () => (<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="2"/><text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" fill="currentColor" fontSize="12" fontWeight="bold">B</text></svg>);
-const MoonIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" /></svg>);
 const UserIcon = ({ className }) => (<svg className={className} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>);
 
 
@@ -36,9 +37,7 @@ const Header = () => {
                          <Link href="/profile" className={`p-2 rounded-full transition-colors ${isDarkTheme ? 'text-zinc-400 hover:text-white hover:bg-zinc-800' : 'text-slate-500 hover:text-slate-800 hover:bg-slate-100'}`}>
                             <UserIcon className="w-5 h-5" />
                         </Link>
-                        <button className="bg-purple-600 text-white font-semibold py-2 px-5 rounded-lg text-sm hover:bg-purple-700 transition-colors">
-                            Connect Wallet
-                        </button>
+                        <WalletMultiButton />
                     </div>
                 </div>
             </nav>
@@ -50,10 +49,12 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className="bg-slate-50">
-        <Header />
-        <main>
-            {children}
-        </main>
+        <WalletContextProvider>
+            <Header />
+            <main>
+                {children}
+            </main>
+        </WalletContextProvider>
       </body>
     </html>
   );
